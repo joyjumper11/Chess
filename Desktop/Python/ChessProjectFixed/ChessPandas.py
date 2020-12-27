@@ -124,10 +124,24 @@ print(whiteRookOne.position, whiteRookOne.validMoves())
 #Then, update the board with the new position and update the piece with its new position (if valid, that'll be added later)
 dfBoard.loc[whiteRookOne.position[1], whiteRookOne.position[0]] = 0
 whiteRookOne.position = ["E", 1]
+dfBoard.loc[1, "E"] = whiteRookOne
+
 print(whiteRookOne.position, whiteRookOne.validMoves())
 print(dfBoard)
 
-df.loc[df['set_of_numbers'] <= 4, 'equal_or_lower_than_4?'] = 'True'
 
 for i in columnLabels:
-    dfBoard.loc[dfBoard[i]] != 0] =
+    for j in integerIndices:
+        if dfBoard[i][j] != 0 or dfBoard[i][j] != 0.0:
+            dfBoard.loc[j,i] = dfBoard.loc[j,i].id
+        else:
+            dfBoard.loc[j,i] = "--"
+
+keys = columnLabels
+values = columnLabels
+footer = dict(zip(keys, values))
+dfBoard = dfBoard.append(footer, ignore_index = True)
+dfBoard.columns = [''] * len(dfBoard.columns)
+dfBoard.index = list(dfBoard.index[1:9]) + [""]
+
+print(dfBoard)
