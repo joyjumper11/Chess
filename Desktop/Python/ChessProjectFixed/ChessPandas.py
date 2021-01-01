@@ -1,16 +1,37 @@
 import numpy as np
 import pandas as pd
 
-#8x8 array, dataframe will have columns and indices for algebraic notation
-arrayBoard = np.zeros((8,8))
-
+# global vars
 columnLabels = ["A", "B", "C", "D", "E", "F", "G", "H"]
 integerIndices = [8, 7, 6, 5, 4, 3, 2, 1]
 
-dfBoard = pd.DataFrame(arrayBoard,
-                        columns = columnLabels,
-                        index = integerIndices)
+def initBoard():
+    #8x8 array, dataframe will have columns and indices for algebraic notation
+    arrayBoard = np.zeros((8,8))
 
+    dfBoard = pd.DataFrame(arrayBoard, columns = columnLabels, index = integerIndices)
+
+    # TODO: populate board with pieces
+
+    return dfBoard
+dfBoard = initBoard()
+
+def printBoard(dataFrame):
+    global columnLabels, integerIndices
+
+    arrayBoard = np.zeros((8,8))
+    dfPrint = pd.DataFrame(arrayBoard,
+                            columns = columnLabels,
+                            index = integerIndices)
+
+    for i in columnLabels:
+        for j in integerIndices:
+            if dataFrame[i][j] != 0 or dataFrame[i][j] != 0.0:
+                dataFrame.loc[j,i] = dfPrint.loc[j,i].id
+            else:
+                dfPrint.loc[j,i] = "--"
+    print(dfPrint)
+    pass
 
 
 
@@ -110,6 +131,8 @@ class Rook:
                 """
         return listOfValidMoves
 
+### TESTING ####
+
 whiteRookOne = Rook("w", ["A", 1])
 blackRookOne = Rook("b", ["A", 4])
 
@@ -128,14 +151,6 @@ dfBoard.loc[1, "E"] = whiteRookOne
 
 print(whiteRookOne.position, whiteRookOne.validMoves())
 print(dfBoard)
-
-
-for i in columnLabels:
-    for j in integerIndices:
-        if dfBoard[i][j] != 0 or dfBoard[i][j] != 0.0:
-            dfBoard.loc[j,i] = dfBoard.loc[j,i].id
-        else:
-            dfBoard.loc[j,i] = "--"
 
 keys = columnLabels
 values = columnLabels
