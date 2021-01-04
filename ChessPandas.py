@@ -7,29 +7,36 @@ integerIndices = [8, 7, 6, 5, 4, 3, 2, 1]
 
 def initBoard():
     #8x8 array, dataframe will have columns and indices for algebraic notation
+    global columnLabels, integerIndices
     arrayBoard = np.zeros((8,8))
-
     dfBoard = pd.DataFrame(arrayBoard, columns = columnLabels, index = integerIndices)
-
+    
+    print(dfBoard)
     # TODO: populate board with pieces
 
     return dfBoard
-dfBoard = initBoard()
 
+# TODO: rewrite
 def printBoard(dataFrame):
-    global columnLabels, integerIndices
 
+    # Board to print
     arrayBoard = np.zeros((8,8))
     dfPrint = pd.DataFrame(arrayBoard,
                             columns = columnLabels,
                             index = integerIndices)
-
+    # Populate board
     for i in columnLabels:
         for j in integerIndices:
             if dataFrame[i][j] != 0 or dataFrame[i][j] != 0.0:
-                dataFrame.loc[j,i] = dfPrint.loc[j,i].id
+                dfPrint.loc[j,i] = dataFrame.loc[j,i].id
             else:
                 dfPrint.loc[j,i] = "--"
+
+    footer = dict(zip(columnLabels, columnLabels))
+    dfPrint = dfPrint.append(footer, ignore_index = True)
+    dfPrint.columns = [''] * len(dfPrint.columns)
+    dfPrint.index = list(dfPrint.index[1:9]) + [""]
+
     print(dfPrint)
     pass
 
@@ -57,53 +64,43 @@ class Rook:
         self.color = color
         self.piece = "R"
         self.id = color + "R"
-        self.position = position #Store positions as a list where the first element is the column and the second element is the index ie ["A", 1]
+        self.pos = position #Store positions as a list where the first element is the column and the second element is the index ie ["A", 1]
 
     def validMoves(self):
         listOfValidMoves = []
         #For a rook, all possible valid moves are those that have the same column or index as the starting position
-        #A valid move for a rook would consist of three parts: the piece name, the column to move to, and the index to move to
-        #Therefore, a valid move has three elements: ["R", "A", 5]
-
-        currentColumn = self.position[0]
-        currentIndex = self.position[1]
+        #A valid move for a rook would consist of three parts: the piece id, the column to move to, and the index to move to
+        #Therefore, a valid move has three elements: [self.id, "A", 5]
 
         #Get where you are in the list of columns and where you are in the list of indices
-        whereAmIColumn = 0
-        whereAmIIndex = 0
 
-        for j in range(len(columnLabels)):
-            if columnLabels[j] == currentColumn:
-                whereAmIColumn = j
-                break
-
-        for i in range(len(integerIndices)):
-            if integerIndices[i] == currentIndex:
-                whereAmIIndex = i
-                break
-
+        currentIndex = 8 - self.pos[1]
+        currentColumn = columnLabels.index(self.pos[0])
+        
         #Now, start at whereAmIIndex and whereAmIColumn then increment/decrement, storing the moves that are to empty squares
         #Stop once you hit a square with a piece (check if it's opposite color, if it is store that move, otherwise don't)
         #Then, repeat for the other directions
         #For example, if at a4, you need to check a5, a6, a7, and a8, stopping if there is a piece in the way, inclusivity depends on what color that piece is
         #whereAmIColumn needs to be used four different times (4 directions to look at)
         #Therefore, store the value temporarily in a variable called i
-        i = whereAmIColumn
-        print("heres", whereAmIColumn, len(columnLabels))
+        i = currentColumn
+        print("heres", currentColumn, len(columnLabels))
         while i < len(columnLabels):
             print(i, "in loop")
             #Check to see if the square you are looking at is the piece you're already looking at
-            if i == whereAmIColumn:
+            if i == currentColumn:
                 pass
             elif dfBoard[columnLabels[i]][currentIndex] == 0.0 or dfBoard[columnLabels[i]][currentIndex] == 0:
-                listOfValidMoves.append([self.piece, columnLabels[i], currentIndex])
+                listOfValidMoves.append([self.piece + self.pos[0], columnLabels[i], integerIndices[currentIndex]])
             else:
+                print("HERE")
                 #If the square isn't blank, it has a piece on it
                 #That piece will belong to a class with the attribute color
                 if dfBoard[columnLabels[i]][currentIndex].color == self.color:
                     break
                 else:
-                    listOfValidMoves.append([self.piece, columnLabels[i], currentIndex])
+                    print("here!!!!")
+                    listOfValidMoves.append([self.piece + self.pos[0] + 'x', columnLabels[i], integerIndices[currentIndex]])
                     break
             i += 1
         """
@@ -132,31 +129,21 @@ class Rook:
         return listOfValidMoves
 
 ### TESTING ####
+dfBoard = initBoard()
 
 whiteRookOne = Rook("w", ["A", 1])
-blackRookOne = Rook("b", ["A", 4])
+blackRookOne = Rook("b", ["D", 1])
 
 #To avoid issue of changing panda slices (??), have to use .loc to change values, put index first and then the column
 dfBoard.loc[1, "A"] = whiteRookOne
 
-dfBoard.loc[4, "A"] = blackRookOne
-print(dfBoard)
-print(whiteRookOne.position, whiteRookOne.validMoves())
+dfBoard.loc[1, "D"] = blackRookOne
+
+printBoard(dfBoard)
+print(whiteRookOne.validMoves())
 
 #Before a move is made, set the previous square equal to 0
 #Then, update the board with the new position and update the piece with its new position (if valid, that'll be added later)
-dfBoard.loc[whiteRookOne.position[1], whiteRookOne.position[0]] = 0
-whiteRookOne.position = ["E", 1]
-dfBoard.loc[1, "E"] = whiteRookOne
-
-print(whiteRookOne.position, whiteRookOne.validMoves())
-print(dfBoard)
-
-keys = columnLabels
-values = columnLabels
-footer = dict(zip(keys, values))
-dfBoard = dfBoard.append(footer, ignore_index = True)
-dfBoard.columns = [''] * len(dfBoard.columns)
-dfBoard.index = list(dfBoard.index[1:9]) + [""]
-
-print(dfBoard)
+# dfBoard.loc[whiteRookOne.position[1], whiteRookOne.position[0]] = 0
+# whiteRookOne.position = ["E", 1]
+# dfBoard.loc[1, "E"] = whiteRookOne
